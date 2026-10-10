@@ -1,22 +1,27 @@
 @import "tailwindcss";
 
-* {
-  box-sizing: border-box;
+@theme {
+  --font-sans: "Hind Siliguri", "Noto Sans Bengali", system-ui, sans-serif;
+
+  --color-brand-50: #f0faf4;
+  --color-brand-100: #d9f2e3;
+  --color-brand-200: #b3e5c8;
+  --color-brand-300: #82d1a4;
+  --color-brand-400: #4fb87f;
+  --color-brand-500: #2a9d62;
+  --color-brand-600: #1b8350;
+  --color-brand-700: #166941;
+  --color-brand-800: #125236;
+  --color-brand-900: #0e3d29;
 }
 
-html {
-  scroll-behavior: smooth;
-  min-width: 320px;
-}
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+  }
 
-body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-  font-family: "Hind Siliguri", "Noto Sans Bengali", sans-serif;
-}
-
-button,
-a {
-  -webkit-tap-highlight-color: transparent;
+  body {
+    @apply bg-white text-slate-800 antialiased;
+  }
 }
