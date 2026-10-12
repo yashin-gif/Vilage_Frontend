@@ -116,6 +116,10 @@ async function request(path, options = {}) {
     throw new ApiError(response.status, detail)
   }
 
+  // সার্ভার মোট সংখ্যা জানালে তালিকার সাথে .total হিসেবে থাকে (পেজিনেশনের জন্য)
+  const total = response.headers.get('X-Total-Count')
+  if (total !== null && Array.isArray(data)) data.total = Number(total)
+
   return data
 }
 

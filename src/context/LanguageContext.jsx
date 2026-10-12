@@ -5,9 +5,13 @@ import bnPages from '../locales/bn.pages.js'
 import enPages from '../locales/en.pages.js'
 import bnMembers from '../locales/bn.members.js'
 import enMembers from '../locales/en.members.js'
+import bnAdmin from '../locales/bn.admin.js'
+import enAdmin from '../locales/en.admin.js'
+import bnFeatures from '../locales/bn.features.js'
+import enFeatures from '../locales/en.features.js'
 import { STORAGE_KEYS } from '../utils/constants'
 
-// bn.js / en.js এর সাথে .pages.js ও .members.js জুড়ে একটাই অভিধান বানায়
+// bn.js / en.js এর সাথে .pages.js, .members.js, .admin.js, .features.js জুড়ে একটাই অভিধান বানায়
 function mergeDeep(base, extra) {
   const result = { ...base }
 
@@ -25,8 +29,8 @@ function mergeDeep(base, extra) {
 }
 
 const dictionaries = {
-  bn: [bnPages, bnMembers].reduce(mergeDeep, bn),
-  en: [enPages, enMembers].reduce(mergeDeep, en),
+  bn: [bnPages, bnMembers, bnAdmin, bnFeatures].reduce(mergeDeep, bn),
+  en: [enPages, enMembers, enAdmin, enFeatures].reduce(mergeDeep, en),
 }
 
 export const LanguageContext = createContext(null)

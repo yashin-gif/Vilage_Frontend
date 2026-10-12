@@ -1,12 +1,15 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import PageHeader from '../components/common/PageHeader'
 import DataState from '../components/common/DataState'
+import Pagination from '../components/common/Pagination'
 import BloodDonorCard from '../components/blood/BloodDonorCard'
 import BloodSearch from '../components/blood/BloodSearch'
-import useFetch from '../hooks/useFetch'
 import useLanguage from '../hooks/useLanguage'
+import usePagedList from '../hooks/usePagedList'
 import { BLOOD_GROUPS } from '../utils/constants'
+
+const PAGE_SIZE = 24
 
 export default function BloodDonors() {
   const { t } = useLanguage()
@@ -18,26 +21,10 @@ export default function BloodDonors() {
   const rawGroup = searchParams.get('group') ?? ''
   const group = BLOOD_GROUPS.includes(rawGroup) ? rawGroup : ''
 
-  const donorsRequest = useFetch('/blood/', { auth: true })
-  const peopleRequest = useFetch('/people/', { auth: true })
-
-  const loading = donorsRequest.loading || peopleRequest.loading
-  const error = donorsRequest.error || peopleRequest.error
-  const allDonors = donorsRequest.data ?? []
-
-  const donors = useMemo(() => {
-    const personById = new Map((peopleRequest.data ?? []).map((person) => [person.id, person]))
-
-    return (donorsRequest.data ?? [])
-      .map((donor) => ({ donor, person: personById.get(donor.person_id) }))
-      .filter(
-        ({ donor }) =>
-          (!group || donor.blood_group === group) &&
-          (!availableOnly || donor.is_available),
-      )
-      // যারা এখন প্রস্তুত তারা আগে
-      .sort((a, b) => Number(b.donor.is_available) - Number(a.donor.is_available))
-  }, [donorsRequest.data, peopleRequest.data, group, availableOnly])
+  const list = usePagedList('/blood/', {
+    params: { blood_group: group, is_available: availableOnly ? 'true' : '' },
+    pageSize: PAGE_SIZE,
+  })
 
   const handleGroupChange = (next) => {
     const params = new URLSearchParams(searchParams)
@@ -48,10 +35,7 @@ export default function BloodDonors() {
     setSearchParams(params, { replace: true })
   }
 
-  const reload = () => {
-    donorsRequest.reload()
-    peopleRequest.reload()
-  }
+  const filtered = group !== '' || availableOnly
 
   return (
     <>
@@ -60,13 +44,13 @@ export default function BloodDonors() {
       <section className="py-12 sm:py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <DataState
-            loading={loading}
-            error={error}
-            isEmpty={allDonors.length === 0}
+            loading={list.loading && list.data.length === 0}
+            error={list.error}
+            isEmpty={list.data.length === 0 && !filtered}
             emptyIcon="🩸"
             emptyTitle={page.emptyTitle}
             emptyText={page.emptyText}
-            onRetry={reload}
+            onRetry={list.reload}
           >
             <BloodSearch
               group={group}
@@ -75,23 +59,23 @@ export default function BloodDonors() {
               onAvailableChange={setAvailableOnly}
             />
 
-            <p className="mt-6 rounded-xl bg-rose-50 px-4 py-3 text-sm font-medium text-rose-800">
-              {page.note}
-            </p>
+            <p className="mt-6 rounded-xl bg-rose-50 px-4 py-3 text-sm font-medium text-rose-800">{page.note}</p>
 
             <p className="mt-6 text-sm font-medium text-slate-500">
-              {donors.length} {page.found}
+              {list.total} {page.found}
             </p>
 
-            {donors.length === 0 ? (
+            {list.data.length === 0 ? (
               <p className="mt-10 text-center text-slate-600">{page.noMatch}</p>
             ) : (
-              <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                {donors.map(({ donor, person }) => (
-                  <BloodDonorCard key={donor.id} donor={donor} person={person} />
+              <div className={`mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 ${list.loading ? 'opacity-60' : ''}`}>
+                {list.data.map((donor) => (
+                  <BloodDonorCard key={donor.id} donor={donor} />
                 ))}
               </div>
             )}
+
+            <Pagination page={list.page} pages={list.pages} onChange={list.setPage} />
           </DataState>
         </div>
       </section>

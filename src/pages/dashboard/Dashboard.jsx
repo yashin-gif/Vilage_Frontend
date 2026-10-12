@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, Droplets, MessagesSquare, ShieldCheck, UserRound, Users } from 'lucide-react'
+import { ArrowRight, BookOpen, Droplets, HandHeart, LayoutDashboard, MessagesSquare, ShieldAlert, ShieldCheck, UserRound, Users } from 'lucide-react'
 import useAuth from '../../hooks/useAuth'
 import useLanguage from '../../hooks/useLanguage'
 
@@ -7,13 +7,21 @@ const LINKS = [
   { key: 'profile', to: '/profile', Icon: UserRound, tint: 'bg-sky-50 text-sky-700' },
   { key: 'blood', to: '/blood-donors', Icon: Droplets, tint: 'bg-rose-50 text-rose-700' },
   { key: 'people', to: '/people', Icon: Users, tint: 'bg-amber-50 text-amber-700' },
+  { key: 'emergency', to: '/emergency', Icon: ShieldAlert, tint: 'bg-red-50 text-red-700' },
+  { key: 'welfare', to: '/welfare', Icon: HandHeart, tint: 'bg-amber-50 text-amber-700' },
+  { key: 'bayan', to: '/bayan', Icon: BookOpen, tint: 'bg-emerald-50 text-emerald-700' },
   { key: 'community', to: '/community', Icon: MessagesSquare, tint: 'bg-violet-50 text-violet-700' },
 ]
+
+// অ্যাডমিন ও মডারেটরদের জন্য অতিরিক্ত লিংক
+const STAFF_LINK = { key: 'admin', to: '/admin', Icon: LayoutDashboard, tint: 'bg-emerald-50 text-emerald-700' }
 
 export default function Dashboard() {
   const { t } = useLanguage()
   const { user } = useAuth()
   const page = t.dashboard
+  const isStaff = user.role === 'admin' || user.role === 'moderator'
+  const links = isStaff ? [STAFF_LINK, ...LINKS] : LINKS
 
   return (
     <>
@@ -39,7 +47,7 @@ export default function Dashboard() {
           <h2 className="text-xl font-bold text-slate-900">{page.quickTitle}</h2>
 
           <div className="mt-6 grid gap-5 sm:grid-cols-2">
-            {LINKS.map(({ key, to, Icon, tint }) => (
+            {links.map(({ key, to, Icon, tint }) => (
               <Link
                 key={key}
                 to={to}

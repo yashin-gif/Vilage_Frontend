@@ -2,6 +2,7 @@ import { Landmark, MapPin, Phone, User } from 'lucide-react'
 import PageHeader from '../components/common/PageHeader'
 import DataState from '../components/common/DataState'
 import InfoCard from '../components/common/InfoCard'
+import Button from '../components/common/Button'
 import MapLink from '../components/places/MapLink'
 import useFetch from '../hooks/useFetch'
 import useLanguage from '../hooks/useLanguage'
@@ -50,6 +51,11 @@ export default function Mosques() {
                   ].filter(Boolean)}
                 >
                   <MapLink item={mosque} />
+                  <div className="mt-4">
+                    <Button to={`/mosques/${mosque.id}/bayan`} variant="outline" className="w-full">
+                      {t.mosqueBayan.link}
+                    </Button>
+                  </div>
                 </InfoCard>
               ))}
             </div>

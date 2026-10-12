@@ -63,7 +63,34 @@ export function AuthProvider({ children }) {
     [startSession],
   )
 
+  const refreshUser = useCallback(async () => {
+    const me = await api.get('/auth/me', { auth: true })
+    setUser(me)
+    return me
+  }, [])
+
+  const updateProfile = useCallback(async (changes) => {
+    const updated = await api.patch('/auth/me', changes, { auth: true })
+    setUser((prev) => ({ ...prev, ...updated }))
+    return updated
+  }, [])
+
+  // পাসওয়ার্ড বদলালে অন্য সব ডিভাইস থেকে লগআউট হয়ে যায়; এই ডিভাইসে নতুন টোকেন বসে
+  const changePassword = useCallback(async (currentPassword, newPassword) => {
+    const tokens = await api.post(
+      '/auth/change-password',
+      { current_password: currentPassword, new_password: newPassword },
+      { auth: true },
+    )
+    tokenStore.set(tokens.access_token, tokens.refresh_token)
+    const me = await api.get('/auth/me', { auth: true })
+    setUser(me)
+  }, [])
+
   const logout = useCallback(() => {
+    // সার্ভারে টোকেন বাতিল করি। ব্যর্থ হলেও স্থানীয়ভাবে লগআউট হবে।
+    // টোকেন এই কলের শুরুতেই পড়া হয়, তাই পরের লাইনে মুছে ফেললেও সমস্যা নেই।
+    api.post('/auth/logout', undefined, { auth: true }).catch(() => {})
     tokenStore.clear()
     setUser(null)
   }, [])
@@ -77,8 +104,11 @@ export function AuthProvider({ children }) {
       login,
       register,
       logout,
+      refreshUser,
+      updateProfile,
+      changePassword,
     }),
-    [user, loading, login, register, logout],
+    [user, loading, login, register, logout, refreshUser, updateProfile, changePassword],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

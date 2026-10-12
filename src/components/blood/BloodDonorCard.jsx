@@ -2,13 +2,13 @@ import { CalendarDays, Droplets, HeartPulse, MapPin, Phone } from 'lucide-react'
 import InfoCard from '../common/InfoCard'
 import useLanguage from '../../hooks/useLanguage'
 import { formatDate } from '../../utils/formatDate'
-import { getFullName, phoneHref } from '../../utils/helpers'
+import { phoneHref } from '../../utils/helpers'
 
-// donor = রক্তদাতার রেকর্ড, person = সেই মানুষের তথ্য (নাম, ফোন, এলাকা)
-export default function BloodDonorCard({ donor, person }) {
+// donor-এর সাথে নাম, ফোন ও এলাকা সার্ভার থেকেই আসে (আলাদা কুয়েরি লাগে না)
+export default function BloodDonorCard({ donor }) {
   const { t, language } = useLanguage()
   const text = t.blood
-  const phone = person?.phone
+  const phone = donor.person_phone
 
   const details = [
     {
@@ -19,7 +19,7 @@ export default function BloodDonorCard({ donor, person }) {
       icon: CalendarDays,
       text: `${text.lastDonation}: ${formatDate(donor.last_donation_date, language)}`,
     },
-    person?.current_location && { icon: MapPin, text: person.current_location },
+    donor.person_location && { icon: MapPin, text: donor.person_location },
     phone && { icon: Phone, text: phone },
   ].filter(Boolean)
 
@@ -27,7 +27,7 @@ export default function BloodDonorCard({ donor, person }) {
     <InfoCard
       icon={Droplets}
       tint="bg-rose-50 text-rose-700"
-      title={person ? getFullName(person) : text.unknownDonor}
+      title={donor.person_name || text.unknownDonor}
       badge={donor.blood_group}
       description={donor.notes}
       details={details}

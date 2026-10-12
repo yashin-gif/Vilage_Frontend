@@ -5,12 +5,12 @@ import { getFullName, phoneHref } from '../../utils/helpers'
 
 // এখানে ইচ্ছে করেই বিধবা/প্রতিবন্ধী/সাহায্যপ্রার্থী চিহ্ন দেখানো হয় না —
 // ওগুলো শুধু অ্যাডমিনের পেজে থাকবে
-export default function PersonCard({ person, family }) {
+export default function PersonCard({ person }) {
   const { t } = useLanguage()
   const text = t.people
 
   const details = [
-    family && { icon: House, text: `${text.family}: ${family.head_name}` },
+    person.family_head && { icon: House, text: `${text.family}: ${person.family_head}` },
     person.occupation && { icon: Briefcase, text: person.occupation },
     person.current_location && { icon: MapPin, text: person.current_location },
     person.phone && {

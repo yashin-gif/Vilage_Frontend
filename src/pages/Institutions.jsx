@@ -35,7 +35,7 @@ export default function Institutions() {
                   icon={GraduationCap}
                   tint="bg-violet-50 text-violet-700"
                   title={institution.name}
-                  badge={institution.institution_type}
+                  badge={t.options.institution_type[institution.institution_type] ?? institution.institution_type}
                   description={institution.description}
                   details={[
                     institution.address && { icon: MapPin, text: institution.address },

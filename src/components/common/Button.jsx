@@ -10,6 +10,7 @@ const variants = {
   ghost: 'text-brand-800 hover:bg-brand-50',
   light: 'bg-white text-brand-800 shadow-sm hover:bg-brand-50',
   outlineLight: 'border border-white/40 text-white hover:bg-white/10',
+  danger: 'bg-rose-600 text-white shadow-sm hover:bg-rose-700',
 }
 
 const sizes = {
